@@ -135,6 +135,32 @@ const deleteUserIntoDB = async (id: string) => {
     });
 
     const result = await prisma.$transaction(async (tx) => {
+        const userReviews = await tx.reviews.findMany({
+            where: { userId: id },
+            select: { id: true }
+        });
+        const reviewIds = userReviews.map((review) => review.id);
+
+        if (reviewIds.length > 0) {
+            // Remove relations linked to this user's reviews first,
+            // otherwise review deletion can fail with FK constraints.
+            await tx.like.deleteMany({
+                where: {
+                    reviewId: {
+                        in: reviewIds
+                    }
+                }
+            });
+
+            await tx.comment.deleteMany({
+                where: {
+                    reviewId: {
+                        in: reviewIds
+                    }
+                }
+            });
+        }
+
         // Delete all comments by the user
         await tx.comment.deleteMany({
             where: { userId: id }

@@ -173,6 +173,29 @@ const deleteUserIntoDB = (id) => __awaiter(void 0, void 0, void 0, function* () 
         where: { id }
     });
     const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        const userReviews = yield tx.reviews.findMany({
+            where: { userId: id },
+            select: { id: true }
+        });
+        const reviewIds = userReviews.map((review) => review.id);
+        if (reviewIds.length > 0) {
+            // Remove relations linked to this user's reviews first,
+            // otherwise review deletion can fail with FK constraints.
+            yield tx.like.deleteMany({
+                where: {
+                    reviewId: {
+                        in: reviewIds
+                    }
+                }
+            });
+            yield tx.comment.deleteMany({
+                where: {
+                    reviewId: {
+                        in: reviewIds
+                    }
+                }
+            });
+        }
         // Delete all comments by the user
         yield tx.comment.deleteMany({
             where: { userId: id }
