@@ -18,7 +18,7 @@ const initPayment = async (paymentData: IPaymentData) => {
     success_url: `${config.ssl.validation_api}?tran_id=${paymentData.transactionId}`,
     fail_url: config.ssl.failed_url,
     cancel_url: config.ssl.cancel_url,
-    ipn_url: "https://movie-server-api.vercel.app/api/ipn",
+    ipn_url: `${config.serverApiUrl}/api/payment/ipn`,
     shipping_method: "N/A",
     product_name: "Appointment",
     product_category: "Service",
