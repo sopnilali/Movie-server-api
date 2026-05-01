@@ -30,7 +30,7 @@ const initPayment = (paymentData) => __awaiter(void 0, void 0, void 0, function*
         success_url: `${config_1.default.ssl.validation_api}?tran_id=${paymentData.transactionId}`,
         fail_url: config_1.default.ssl.failed_url,
         cancel_url: config_1.default.ssl.cancel_url,
-        ipn_url: "https://movie-server-api.vercel.app/api/ipn",
+        ipn_url: `${config_1.default.serverApiUrl}/api/payment/ipn`,
         shipping_method: "N/A",
         product_name: "Appointment",
         product_category: "Service",

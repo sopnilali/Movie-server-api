@@ -33,5 +33,6 @@ exports.default = {
         email: process.env.SENDER_EMAIL,
         app_pass: process.env.SENDER_APP_PASS,
     },
+    serverApiUrl: process.env.SERVER_API_URL,
     node_env: process.env.PRODUCTION
 };
