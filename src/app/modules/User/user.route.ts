@@ -5,6 +5,7 @@ import { UserValidation } from "./user.validation";
 import auth from "../../middleware/auth";
 import { UserRole } from "@prisma/client";
 import { FileUploader } from "../../helper/fileUploader";
+import { authValidation } from "../Auth/auth.validation";
 
 const router = express.Router();
 
@@ -17,6 +18,13 @@ router.post(
 );
 router.get("/", UserController.getAllUserData);
 router.get("/:id", UserController.getUserById);
+router.patch(
+  "/change-password",
+  auth(UserRole.ADMIN, UserRole.USER),
+  validateRequest(authValidation.changePasswordValidationSchema),
+  UserController.changePassword
+);
+
 router.patch(
   "/:id",
   auth(UserRole.ADMIN, UserRole.USER),

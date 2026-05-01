@@ -4,6 +4,7 @@ import { UserServices } from "./user.service";
 import pick from "../../utils/pick";
 import { userFilterableFields } from "./user.constant";
 import sendResponse from "../../helper/sendResponse";
+import AppError from "../../errors/AppError";
 
  
 const RegisterUser = catchAsync(async(req, res)=> {
@@ -62,6 +63,20 @@ const UpdateUser = catchAsync(async(req, res)=> {
     })
 })
 
+const changePassword = catchAsync(async(req, res)=> {
+    const userId = req.user?.id
+    if (!userId) {
+        throw new AppError(httpStatus.UNAUTHORIZED, "You are not Authorized")
+    }
+    const result = await UserServices.changePasswordIntoDB({ id: userId }, req.body)
+    sendResponse(res, {
+        success: true,
+        message: "Password changed successfully!",
+        statusCode: httpStatus.OK,
+        data: result
+    })
+})
+
 
 export const UserController = {
  
@@ -69,7 +84,8 @@ export const UserController = {
     getAllUserData,
     getUserById,
     DeleteUser,
-    UpdateUser
+    UpdateUser,
+    changePassword
  
 
 }

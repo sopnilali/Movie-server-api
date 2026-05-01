@@ -220,10 +220,35 @@ const updateUserIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* ()
     }));
     return result;
 });
+const changePasswordIntoDB = (userData, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield prisma_1.default.user.findUnique({
+        where: {
+            id: userData.id
+        }
+    });
+    if (!user) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found");
+    }
+    const isOldPasswordMatched = yield bcrypt.compare(payload.oldPassword, user.password);
+    if (!isOldPasswordMatched) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Old password is incorrect");
+    }
+    const hashedPassword = yield bcrypt.hash(payload.newPassword, 12);
+    yield prisma_1.default.user.update({
+        where: {
+            id: user.id
+        },
+        data: {
+            password: hashedPassword
+        }
+    });
+    return null;
+});
 exports.UserServices = {
     UserRegisterIntoDB,
     getAllFromDB,
     getUserByIdIntoDB,
     deleteUserIntoDB,
-    updateUserIntoDB
+    updateUserIntoDB,
+    changePasswordIntoDB
 };

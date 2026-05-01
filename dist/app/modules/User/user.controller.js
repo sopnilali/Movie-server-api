@@ -19,6 +19,7 @@ const user_service_1 = require("./user.service");
 const pick_1 = __importDefault(require("../../utils/pick"));
 const user_constant_1 = require("./user.constant");
 const sendResponse_1 = __importDefault(require("../../helper/sendResponse"));
+const AppError_1 = __importDefault(require("../../errors/AppError"));
 const RegisterUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield user_service_1.UserServices.UserRegisterIntoDB(req);
     (0, sendResponse_1.default)(res, {
@@ -68,10 +69,25 @@ const UpdateUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, 
         data: result
     });
 }));
+const changePassword = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    if (!userId) {
+        throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not Authorized");
+    }
+    const result = yield user_service_1.UserServices.changePasswordIntoDB({ id: userId }, req.body);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        message: "Password changed successfully!",
+        statusCode: http_status_1.default.OK,
+        data: result
+    });
+}));
 exports.UserController = {
     RegisterUser,
     getAllUserData,
     getUserById,
     DeleteUser,
-    UpdateUser
+    UpdateUser,
+    changePassword
 };

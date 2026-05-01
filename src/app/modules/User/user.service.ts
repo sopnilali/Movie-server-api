@@ -197,10 +197,41 @@ const updateUserIntoDB = async (req: any) => {
     return result
 }
 
+const changePasswordIntoDB = async (userData: { id: string }, payload: { oldPassword: string; newPassword: string }) => {
+    const user = await prisma.user.findUnique({
+        where: {
+            id: userData.id
+        }
+    })
+
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, "User not found")
+    }
+
+    const isOldPasswordMatched = await bcrypt.compare(payload.oldPassword, user.password)
+    if (!isOldPasswordMatched) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Old password is incorrect")
+    }
+
+    const hashedPassword = await bcrypt.hash(payload.newPassword, 12)
+
+    await prisma.user.update({
+        where: {
+            id: user.id
+        },
+        data: {
+            password: hashedPassword
+        }
+    })
+
+    return null
+}
+
 export const UserServices = {
     UserRegisterIntoDB,
     getAllFromDB,
     getUserByIdIntoDB,
     deleteUserIntoDB,
-    updateUserIntoDB
+    updateUserIntoDB,
+    changePasswordIntoDB
 }
